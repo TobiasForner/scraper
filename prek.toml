@@ -1,0 +1,40 @@
+# Configuration file for `prek`, a git hook framework written in Rust.
+# See https://prek.j178.dev for more information.
+#:schema https://www.schemastore.org/prek.json
+
+[[repos]]
+repo = "https://github.com/pre-commit/pre-commit-hooks"
+rev = "v4.4.0"
+hooks = [
+  { id = "trailing-whitespace" },
+  { id = "end-of-file-fixer" },
+  { id = "check-merge-conflict" }
+]
+
+[[repos]]
+repo = "https://github.com/psf/black"
+rev = "24.3.0"
+hooks = [
+  { id = "black" }
+]
+
+[[repos]]
+repo = "https://github.com/PyCQA/flake8"
+rev = "6.1.0"
+hooks = [
+  { id = "flake8" }
+]
+
+[[repos]]
+repo = "https://github.com/PyCQA/isort"
+rev = "8.0.1"
+hooks = [
+  { id = "isort" }
+]
+
+[[repos]]
+repo = "https://github.com/pre-commit/mirrors-mypy"
+rev = "v1.6.1"
+hooks = [
+  { id = "mypy" }
+]
