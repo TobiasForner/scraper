@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "scraper"
+version = "0.1"
+dependencies = [
+        "typer",
+        "requests",
+        "selenium",
+        "opencv-python",
+        "numpy",
+        "Pillow",
+        "pyAesCrypt",
+        "selenium_stealth",
+        "pydantic",
+	"platformdirs",
+	"pure-python-adb",
+	"bs4",
+	"ebooklib"
+]
+
+[project.scripts]
+scrape = "scraper:main.app"

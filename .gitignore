@@ -1,0 +1,11 @@
+*.jpg
+*.jpeg
+*.png
+*.svg
+*.html
+*.egg-info
+*.epub
+__pycache__
+download_progress.json
+.vscode
+urls.json
