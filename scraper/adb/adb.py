@@ -176,11 +176,11 @@ def local_files_not_on_device(name: str, base_dir: Path, device: Device) -> list
     Returns:
         list[Path]: list of image paths
     """
-    local_files = images_in_dir(base_dir)
+    local_images_dir = base_dir / "downloaded_images"
+    local_files = images_in_dir(local_images_dir)
     on_device = [
         f.replace(f"{IMAGE_DIR}/{name}/", "") for f in files_on_device(name, device)
     ]
-    local_images_dir = Path(base_dir, "downloaded_images")
 
     diff = [
         f for f in local_files if str(f.relative_to(local_images_dir)) not in on_device
