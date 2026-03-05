@@ -23,3 +23,6 @@ dependencies = [
 
 [project.scripts]
 scrape = "scraper:main.app"
+
+[tool.black]
+line-length = 80
