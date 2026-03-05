@@ -71,7 +71,8 @@ class Ranges(BaseModel):
         for r in self.ranges[1:]:
             if last_range.end + 1 >= r.start:
                 last_range = IntRange(
-                    start=min(last_range.start, r.start), end=max(last_range.end, r.end)
+                    start=min(last_range.start, r.start),
+                    end=max(last_range.end, r.end),
                 )
             else:
                 new_ranges.append(last_range)

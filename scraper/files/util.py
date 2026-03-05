@@ -50,7 +50,9 @@ def files_in_dir(directory: Path, extensions: list[str] | None = None) -> list[P
     return res
 
 
-def partition_improved_images(images: list[Path]) -> dict[tuple[str, int], list[Path]]:
+def partition_improved_images(
+    images: list[Path],
+) -> dict[tuple[str, int], list[Path]]:
     """Partition images by series name and chapter
 
     Args:

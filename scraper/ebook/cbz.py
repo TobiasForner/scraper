@@ -22,7 +22,12 @@ def cbz_chapter_images(name: str, chapter: int, pm: RangesProgressManager):
         if chapter in by_chapter:
             images = by_chapter[chapter]
             dest = loc.joinpath("archives", f"{name}_{chapter:04}.7z")
-            com = ["7z", "a", str(dest), *[str(i).replace("\\\\", "/") for i in images]]
+            com = [
+                "7z",
+                "a",
+                str(dest),
+                *[str(i).replace("\\\\", "/") for i in images],
+            ]
             _ = subprocess.call(com)
             __convert_to_cbz(name, chapter, pm)
         else:

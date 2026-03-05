@@ -50,13 +50,18 @@ def __set_copy(name: str, do_copy: bool):
 
 @app.command(name="copy", help="Copy files from PC to your phone via ADB")
 def adb_copy(
-    names: list[str] = typer.Argument([]), all: bool = False, ask_for_each: bool = False
+    names: list[str] = typer.Argument([]),
+    all: bool = False,
+    ask_for_each: bool = False,
 ):
     pm = RangesProgressManager()
     progress = pm.load_progress()
     if all:
         if names:
-            print("Error, option 'all' is used, but names were also specified:", names)
+            print(
+                "Error, option 'all' is used, but names were also specified:",
+                names,
+            )
             return
 
         names = [

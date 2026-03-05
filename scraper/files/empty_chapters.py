@@ -1,6 +1,10 @@
 from scraper.download.download_progress import DownloadType
 from scraper.download.progress_manager import RangesProgressManager
-from scraper.files.util import images_in_dir, partition_improved_images, remove_chapter
+from scraper.files.util import (
+    images_in_dir,
+    partition_improved_images,
+    remove_chapter,
+)
 
 
 def list_empty_chapters(
