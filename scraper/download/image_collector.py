@@ -187,10 +187,16 @@ class ImageCollector:
 
 @contextmanager
 def image_collector(
-    batch_number: int, out_directory: Path, name: str, skip_download: bool = False
+    batch_number: int,
+    out_directory: Path,
+    name: str,
+    skip_download: bool = False,
 ):
     mc = ImageCollector(
-        out_directory, name=name, batch_number=batch_number, skip_download=skip_download
+        out_directory,
+        name=name,
+        batch_number=batch_number,
+        skip_download=skip_download,
     )
     try:
         yield mc

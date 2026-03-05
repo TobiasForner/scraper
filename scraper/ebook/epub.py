@@ -68,7 +68,10 @@ class RemoveStrings(BaseModel):
 
 
 def get_html_text(
-    progress: RangesProgress, name: str, chapter: int, remove_strings: RemoveStrings
+    progress: RangesProgress,
+    name: str,
+    chapter: int,
+    remove_strings: RemoveStrings,
 ) -> str | None:
     chapter_path = progress.dl_locations[0] / f"{name}_{chapter}.txt"
     with open(chapter_path, encoding="utf-8") as f:
@@ -188,7 +191,10 @@ def build_epub(
         chapter_file = f"chapter{chapter}.xhtml"
         c = epub.EpubHtml(title=chapter_title, file_name=chapter_file, lang="en")
         content = get_html_text(
-            progress=progress, name=name, chapter=chapter, remove_strings=remove_strings
+            progress=progress,
+            name=name,
+            chapter=chapter,
+            remove_strings=remove_strings,
         )
         if content is None:
             print(f"failed to find content for {name} {chapter}")

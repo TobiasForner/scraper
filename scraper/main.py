@@ -12,7 +12,9 @@ app.add_typer(files_typer, name="files", help="Manage local files")
 app.add_typer(adb_typer, name="adb", help="Manage files on ADB device")
 app.add_typer(img_typer, name="img", help="Manipulate local image files")
 app.add_typer(
-    ebook_typer, name="ebook", help="Assemble local text files into ebook formats"
+    ebook_typer,
+    name="ebook",
+    help="Assemble local text files into ebook formats",
 )
 
 

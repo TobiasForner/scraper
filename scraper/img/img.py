@@ -26,7 +26,10 @@ app = typer.Typer()
 
 @app.command()
 def batch(
-    directory: str, out_directory: str = ".", threshold: int = 200, name: str = ""
+    directory: str,
+    out_directory: str = ".",
+    threshold: int = 200,
+    name: str = "",
 ):
     dir = Path(directory).resolve()
     images = images_in_dir(dir)

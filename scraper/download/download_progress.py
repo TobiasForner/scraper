@@ -44,7 +44,7 @@ class RangesProgress(BaseModel):
         return self.ranges.add(chapter)
 
     def remove(self, chapter: int):
-        self.ranges.remove(chapter)
+        _ = self.ranges.remove(chapter)
 
     def has_base_dir(self) -> bool:
         return bool(self.dl_locations)
@@ -101,7 +101,7 @@ class AllProgress(BaseModel):
             return prog.add(url, dl_location, chapter)
         else:
             p = RangesProgress.new(name, dl_type)
-            p.add(url, dl_location, chapter)
+            _ = p.add(url, dl_location, chapter)
             self.progress_by_name[name] = p
             return True
 

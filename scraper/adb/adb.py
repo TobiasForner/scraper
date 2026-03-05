@@ -49,12 +49,19 @@ def __set_copy(name: str, do_copy: bool):
 
 
 @app.command(name="copy", help="Copy files from PC to your phone via ADB")
-def adb_copy(names: list[str] = [], all: bool = False, ask_for_each: bool = False):
+def adb_copy(
+    names: list[str] = typer.Argument([]),
+    all: bool = False,
+    ask_for_each: bool = False,
+):
     pm = RangesProgressManager()
     progress = pm.load_progress()
     if all:
         if names:
-            print("Error, option 'all' is used, but names were also specified:", names)
+            print(
+                "Error, option 'all' is used, but names were also specified:",
+                names,
+            )
             return
 
         names = [
@@ -128,7 +135,7 @@ def ensure_nomedia():
 
 
 def files_on_device(name: str, device: Device) -> list[str]:
-    res = device.shell(f"find {IMAGE_DIR}/{name} -type f")  # type: ignore
+    res = __shell_on_device(device=device, cmd=f"find {IMAGE_DIR}/{name} -type f")
     if res is None:
         print(f"Failed to find files in directory {IMAGE_DIR}/{name} on device!")
         sys.exit(1)
@@ -139,7 +146,7 @@ def files_on_device(name: str, device: Device) -> list[str]:
 def remove_files_from_device(files: list[str], device: Device):
     for file in files:
         print(f"Removing {file}")
-        device.shell(f"rm {file}")
+        _ = __shell_on_device(device=device, cmd=f"rm {file}")
 
 
 def remove_chapter_files_adb(name: str, chapter: int, pm: RangesProgressManager):
@@ -194,14 +201,14 @@ def ensure_nomedia_file_for_name(name: str, device: Device):
     ]
     if ".nomedia" not in on_device:
         print(f".nomedia file missing for {name}")
-        device.shell(f"touch {IMAGE_DIR}/{name}/.nomedia")
+        _ = __shell_on_device(device=device, cmd=f"touch {IMAGE_DIR}/{name}/.nomedia")
         print(f"Created .nomedia file for {name}")
         print(f"Renaming {name} and reverting name change...")
         real_name_dir = f"{IMAGE_DIR}/{name}"
         mod_name_dir = f"{IMAGE_DIR}/{name}_old"
-        device.shell(f"mv {real_name_dir} {mod_name_dir}")
+        _ = __shell_on_device(device=device, cmd=f"mv {real_name_dir} {mod_name_dir}")
         time.sleep(2)
-        device.shell(f"mv {mod_name_dir} {real_name_dir}")
+        _ = __shell_on_device(device=device, cmd=f"mv {mod_name_dir} {real_name_dir}")
 
 
 def ensure_nomedia_file():
@@ -216,7 +223,7 @@ def local_file_ranges_not_on_device(
     name: str, base_dir: Path, device: Device, verbose: bool
 ) -> dict[str, Ranges]:
     diff = local_files_not_on_device(name, base_dir, device)
-    chapters = defaultdict(list)
+    chapters: dict[str, list[int]] = defaultdict(list)
     for im in diff:
         split = image_split(im)
         if split is None:
@@ -289,16 +296,12 @@ def push_diff(name: str, source_dir: Path, device: Device, confirmed: bool = Fal
 
 
 def names_on_device(device: Device):
-    res: str | None = device.shell(
-        f"find {IMAGE_DIR} -type d"
-    )  # pyright:ignore[reportUnknownMemberType, reportUnknownVariableType]
+    res: str | None = __shell_on_device(device, f"find {IMAGE_DIR} -type d")
     if res is None:
         print(f"Failed to find directories in {IMAGE_DIR} on device!")
         sys.exit(1)
-    res_lines: list[str] = res.split(
-        "\n"
-    )  # pyright:ignore[reportUnknownMemberType, reportUnknownVariableType]
-    rel_res = [f.replace(f"{IMAGE_DIR}/", "") for f in res_lines]
+    res_lines: list[str] = res.split("\n")
+    rel_res: list[str] = [f.replace(f"{IMAGE_DIR}/", "") for f in res_lines]
     rel_res = [f for f in rel_res if "/" not in f]
     rel_res = [
         f
@@ -314,6 +317,15 @@ def names_on_device(device: Device):
         )
     ]
     print(rel_res)
+
+
+def __shell_on_device(device: Device, cmd: str) -> str | None:
+    res = device.shell(
+        cmd=cmd
+    )  # pyright:ignore[reportUnknownMemberType, reportUnknownVariableType]
+    if res is None or isinstance(res, str):
+        return res
+    raise TypeError("Unexpected type from shell call")
 
 
 if __name__ == "__main__":

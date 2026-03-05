@@ -15,7 +15,10 @@ from rich.progress import Progress
 
 from scraper.download.download_progress import DownloadType, RangesProgress
 from scraper.download.image_collector import ImageResult, collect_images_single
-from scraper.download.progress_manager import DynRangesProgUpdate, RangesProgressManager
+from scraper.download.progress_manager import (
+    DynRangesProgUpdate,
+    RangesProgressManager,
+)
 from scraper.download.text_collector import TextResult, scrape_text
 from scraper.img.batch_images import batch_improved_images
 from scraper.util.dynamic_ranges import Ranges
@@ -548,7 +551,10 @@ def fill_gaps(
         for name in progress.progress_by_name:
             extend_targets(name)
     download_targets(
-        targets=targets, progress_manager=pm, batches=batches, num_threads=num_threads
+        targets=targets,
+        progress_manager=pm,
+        batches=batches,
+        num_threads=num_threads,
     )
 
 
