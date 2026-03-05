@@ -9,6 +9,7 @@ from ppadb.client import Client as AdbClient
 from ppadb.device import Device
 from rich.progress import track
 
+from scraper.download.download_progress import DownloadType
 from scraper.download.progress_manager import RangesProgressManager
 from scraper.files.util import images_in_dir, partition_improved_images
 from scraper.img.image_tools import find_blocked_chapters, image_split
@@ -59,7 +60,7 @@ def adb_copy(names: list[str] = [], all: bool = False, ask_for_each: bool = Fals
         names = [
             name
             for name, progress in progress.progress_by_name.items()
-            if progress.download_type == "images" and progress.do_copy
+            if progress.download_type is DownloadType.images and progress.do_copy
         ]
         if ask_for_each:
             ask_for_each = not typer.confirm(

@@ -13,7 +13,7 @@ import typer
 from attr import dataclass
 from rich.progress import Progress
 
-from scraper.download.download_progress import RangesProgress
+from scraper.download.download_progress import DownloadType, RangesProgress
 from scraper.download.image_collector import ImageResult, collect_images_single
 from scraper.download.progress_manager import DynRangesProgUpdate, RangesProgressManager
 from scraper.download.text_collector import TextResult, scrape_text
@@ -31,7 +31,7 @@ class ChapterTarget:
     base_url: str
     chapter: int
     target_dir: Path
-    download_type: str
+    download_type: DownloadType
 
 
 @dataclass
@@ -41,7 +41,7 @@ class DownloadTarget:
     start: int
     end: int
     target_dir: Path
-    download_type: str = "images"
+    download_type: DownloadType = DownloadType.images
 
     def count(self) -> int:
         return self.end - self.start + 1
@@ -53,7 +53,7 @@ class DownloadTarget:
         return f"{self.name} {range_str} ({self.download_type})"
 
     def __download_dir(self) -> Path:
-        if self.download_type == "text":
+        if self.download_type is DownloadType.text:
             return self.target_dir
         else:
             return self.target_dir / "downloaded_images"
@@ -99,7 +99,7 @@ def download(
         ),
     ] = platformdirs.user_data_path("scraper", "TF"),
     batches: bool = False,
-    dltype: str = "images",
+    dltype: DownloadType = DownloadType.images,
 ):
     """Downloads images from a range of URLs and arranges them in a single png file for
     each URL.
@@ -284,10 +284,8 @@ def __get_new_chapter_updates_for_prog(
         return []
     base_url = template_urls[-1]
     chapter = prog.end
-    target_dir = Path(
-        *(p for p in prog.dl_locations[-1].parts if p != "downloaded_images")
-    )
-    if prog.download_type == "images" and target_dir.parts[-1] != "downloaded_images":
+    target_dir = prog.base_dir()
+    if prog.download_type is DownloadType.images:
         target_dir = target_dir / "downloaded_images"
 
     next_url = base_url.replace("HERE", str(chapter + 1))
@@ -357,7 +355,7 @@ def download_targets(
         target.target_dir.mkdir(parents=True, exist_ok=True)
 
         print(f"Collecting images for {target.name} {target.chapter}")
-        if target.download_type == "images":
+        if target.download_type is DownloadType.images:
             image_result = collect_images_single(
                 target.name, target.chapter, target.url, target.target_dir
             )
@@ -376,7 +374,7 @@ def download_targets(
                 print(
                     f"Only got {len(image_result.image_locations)} images for {target.name} {target.chapter}. Not logging as downloaded."
                 )
-        elif target.download_type == "text":
+        elif target.download_type is DownloadType.text:
             _ = scrape_text(
                 name=target.name,
                 chapter=target.chapter,
@@ -403,7 +401,7 @@ def download_targets(
 
                 # TODO: make collect_images_single and collect_text have the same signature, then these two can be simplified by changing only the collection function
                 scraping_function = collect_images_single
-                if target.download_type == "text":
+                if target.download_type is DownloadType.text:
                     scraping_function = scrape_text
                 fut_results.append(
                     executor.submit(
@@ -448,7 +446,7 @@ def download_targets(
                     valid_completion = True
                     match res:
                         case ImageResult(name, chapter, image_locations, _):
-                            dl_type = "images"
+                            dl_type: DownloadType = DownloadType.images
                             downloaded_images.append(res)
                             if len(image_locations) <= 1:
                                 valid_completion = False
@@ -456,7 +454,7 @@ def download_targets(
                                     f"Only found the following images: {image_locations} for {name} {chapter}, not logging as downloaded."
                                 )
                         case TextResult(name, chapter):
-                            dl_type = "text"
+                            dl_type = DownloadType.text
                     if valid_completion:
                         _ = successful_downloads[name].add(chapter)
                         # figure out base_url

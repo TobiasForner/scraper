@@ -7,7 +7,7 @@ import platformdirs
 import pyAesCrypt
 import typer
 
-from scraper.download.download_progress import AllProgress
+from scraper.download.download_progress import AllProgress, DownloadType
 from scraper.util.logging_config import get_logger
 
 PROGRESS_FILE_ENCRYPTED = "download_progress.json.aes"
@@ -72,7 +72,12 @@ class DynRangesProgUpdate:
         self.logger: Logger = get_logger("DynRangesProgUpdate")
 
     def add_completion(
-        self, name: str, dl_location: Path, chapter: int, url: str, dl_type: str
+        self,
+        name: str,
+        dl_location: Path,
+        chapter: int,
+        url: str,
+        dl_type: DownloadType,
     ):
         progress = self.pm.load_progress()
         res = progress.add(

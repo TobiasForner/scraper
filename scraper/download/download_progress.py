@@ -1,8 +1,14 @@
+from enum import Enum
 from pathlib import Path
 
 from pydantic import BaseModel, Field
 
 from scraper.util.dynamic_ranges import Ranges
+
+
+class DownloadType(str, Enum):
+    images = "images"
+    text = "text"
 
 
 class RangesProgress(BaseModel):
@@ -12,7 +18,7 @@ class RangesProgress(BaseModel):
     ranges: Ranges
     stopped: bool = Field(default=False)
     do_copy: bool = Field(default=True)
-    download_type: str = Field(default="images")
+    download_type: DownloadType = Field(default=DownloadType.images)
 
     def add(self, url: str, dl_location: Path, chapter: int) -> bool:
         """Adds a downloaded chapter, merges ranges afterwards
@@ -63,7 +69,7 @@ class RangesProgress(BaseModel):
             yield chapter
 
     @staticmethod
-    def new(name: str, dl_type: str):
+    def new(name: str, dl_type: DownloadType):
         return RangesProgress(
             name=name,
             urls=[],
@@ -76,10 +82,23 @@ class RangesProgress(BaseModel):
 class AllProgress(BaseModel):
     progress_by_name: dict[str, RangesProgress]
 
-    def add(self, name: str, url: str, dl_location: Path, chapter: int, dl_type: str):
+    def add(
+        self,
+        name: str,
+        url: str,
+        dl_location: Path,
+        chapter: int,
+        dl_type: DownloadType,
+    ):
         if name in self.progress_by_name:
-            self.progress_by_name[name].download_type = dl_type
-            return self.progress_by_name[name].add(url, dl_location, chapter)
+            prog = self.progress_by_name[name]
+
+            if prog.download_type is not dl_type:
+                print(
+                    f"ERROR: new download type {dl_type} does not match the existing one {prog.download_type}"
+                )
+                return
+            return prog.add(url, dl_location, chapter)
         else:
             p = RangesProgress.new(name, dl_type)
             p.add(url, dl_location, chapter)

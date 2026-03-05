@@ -1,3 +1,4 @@
+from scraper.download.download_progress import DownloadType
 from scraper.download.progress_manager import RangesProgressManager
 from scraper.files.util import images_in_dir, partition_improved_images, remove_chapter
 
@@ -55,7 +56,7 @@ def __empty_chapters_for(
     progress = pm.load_progress()
     if name in progress.progress_by_name:
         prog = progress.progress_by_name[name]
-        if prog.download_type == "text":
+        if prog.download_type is DownloadType.text:
             return res
         if prog.has_base_dir():
             images = images_in_dir(prog.base_dir() / "downloaded_images")
