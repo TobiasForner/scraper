@@ -2,9 +2,7 @@ import subprocess
 import sys
 import time
 from collections import defaultdict
-from dataclasses import dataclass
 from pathlib import Path
-from typing import Self, override
 
 import typer
 from ppadb.client import Client as AdbClient
@@ -14,6 +12,7 @@ from rich.progress import track
 from scraper.download.progress_manager import RangesProgressManager
 from scraper.files.util import images_in_dir, partition_improved_images
 from scraper.img.image_tools import find_blocked_chapters, image_split
+from scraper.util.dynamic_ranges import Ranges
 
 IMAGE_DIR = "/storage/emulated/0/Pictures"
 
@@ -105,7 +104,7 @@ def print_local_file_ranges_not_on_device(name: str, verbose: bool = False):
         if not ranges:
             print(f"No new items for {name}")
         for name, rs in ranges.items():
-            print(f"{name}:", ", ".join(r.as_str(include_name=False) for r in rs))
+            print(f"{name}: {str(rs)}")
 
     pm = RangesProgressManager()
     progress = pm.load_progress().progress_by_name
@@ -212,53 +211,9 @@ def ensure_nomedia_file():
         ensure_nomedia_file_for_name(name, device)
 
 
-@dataclass
-class Range:
-    name: str
-    start: int
-    end: int
-
-    def combine(self, other: Self | int):
-        if isinstance(other, int):
-            if other == self.start - 1:
-                self.start = other
-            elif other == self.end + 1:
-                self.end = other
-            elif not (self.start <= other <= self.end):
-                return False
-            return True
-
-        else:
-            if (
-                self.start <= other.start <= self.end
-                or other.start <= self.start <= other.end
-            ):
-                self.start = min(self.start, other.start)
-                self.end = max(self.end, other.end)
-                return True
-            return False
-
-    def as_str(self, include_name: bool) -> str:
-        if self.start == self.end:
-            r = str(self.start)
-        else:
-            r = f"{self.start}-{self.end}"
-        if include_name:
-            return f"{self.name}: {r}"
-        else:
-            return r
-
-    @override
-    def __str__(self) -> str:
-        if self.start == self.end:
-            return f"{self.name}: {self.start}"
-
-        return f"{self.name}: {self.start}-{self.end}"
-
-
 def local_file_ranges_not_on_device(
     name: str, base_dir: Path, device: Device, verbose: bool
-) -> dict[str, list[Range]]:
+) -> dict[str, Ranges]:
     diff = local_files_not_on_device(name, base_dir, device)
     chapters = defaultdict(list)
     for im in diff:
@@ -269,17 +224,12 @@ def local_file_ranges_not_on_device(
             continue
         name, chapter, _ = split
         chapters[name].append(chapter)
-    res = {}
+    res: dict[str, Ranges] = {}
     for name, cs in chapters.items():
-        cs.sort()
-        r = Range(name, cs[0], cs[0])
-        ranges = []
-        for c in cs[1:]:
-            if not r.combine(c):
-                ranges.append(r)
-                r = Range(name, c, c)
-        if r not in ranges:
-            ranges.append(r)
+        ranges = Ranges(ranges=[])
+
+        for c in cs:
+            _ = ranges.add(c)
         res[name] = ranges
     return res
 
