@@ -10,6 +10,11 @@ The tool is centered arount chapter-based websites like webtoons or manga. See b
 - conversion to cbz for images (e.g. manga)
 - scripts for image manipulation
 
+**Note**: To deal with websites that load their content lazily, the tool lets the instrumented browser scroll through website content slowly in an attempt to mimic typical user behaviour.
+Furthermore, it waits every now and then to avoid being caught for navigating websites too quickly or for sending too many requests.
+Thus, it is recommended to use the tool to get multiple chapters while running in the background.
+Then, the downloaded files can be processed further depending on their type.
+
 ## Quickstart
 1. Install `scraper`: `pip install .`.
 2. Look up a url for a chapter of the content you would like to scrape. Then getting started is as simple as replacing the chapter number in the url with the placeholder text `HERE` (it is planned to make this configurable at some point).
