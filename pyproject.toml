@@ -26,3 +26,8 @@ scrape = "scraper:main.app"
 
 [tool.black]
 line-length = 80
+
+[tool.isort]
+profile = "black"
+line_length = 80
+src_paths = ["scraper"]
