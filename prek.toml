@@ -17,3 +17,8 @@ rev = "26.1.0"
 hooks = [
   { id = "black" }
 ]
+
+[[repos]]
+repo = "https://github.com/pycqa/isort"
+rev = "8.0.1"
+hooks = [{id = "isort", args = ["--profile", "black"]}]
