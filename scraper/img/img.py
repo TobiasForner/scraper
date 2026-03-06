@@ -1,25 +1,22 @@
 import os
-
 import sys
-
 from pathlib import Path
 
 import cv2
-from rich.progress import track
 import typer
+from rich.progress import track
 
-
+from scraper.download.image_names import ImageNames
+from scraper.files.util import partition_improved_images
 from scraper.img.batch_images import (
     batch_all_images,
 )
-from scraper.download.image_names import ImageNames
 from scraper.img.image_tools import (
     images_above_threshold,
     images_in_dir,
     should_split,
     split_loaded_image,
 )
-from scraper.files.util import partition_improved_images
 
 app = typer.Typer()
 
@@ -96,7 +93,9 @@ def split_images(directory: str):
             if should_split(image):
                 name1 = image_names.next(extension=extension)
                 name2 = image_names.next(extension=extension)
-                split_loaded_image(image=image, out_loc_1=name1, out_loc_2=name2)
+                split_loaded_image(
+                    image=image, out_loc_1=name1, out_loc_2=name2
+                )
             else:
                 cv2.imwrite(str(image_names.next(extension=extension)), image)
 

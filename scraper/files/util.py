@@ -1,9 +1,10 @@
+import re
+from collections import defaultdict
+from pathlib import Path
+
 from scraper.download.progress_manager import (
     RangesProgressManager,
 )
-from pathlib import Path
-from collections import defaultdict
-import re
 
 IMPROVED_PATTERN = re.compile(r"(.*)_(\d+)_\d+\.(jpeg|jpg|png|svg)")
 
@@ -32,7 +33,9 @@ def images_in_dir(directory: Path) -> list[Path]:
     return files_in_dir(directory, [".png", ".jpeg", ".jpg"])
 
 
-def files_in_dir(directory: Path, extensions: list[str] | None = None) -> list[Path]:
+def files_in_dir(
+    directory: Path, extensions: list[str] | None = None
+) -> list[Path]:
     """Get a list of files directly contained in a directory
 
     Args:
@@ -45,7 +48,9 @@ def files_in_dir(directory: Path, extensions: list[str] | None = None) -> list[P
     res: list[Path] = []
     path = Path(directory).resolve()
     for element in path.iterdir():
-        if element.is_file() and (not extensions or element.suffix in extensions):
+        if element.is_file() and (
+            not extensions or element.suffix in extensions
+        ):
             res.append(element)
     return res
 

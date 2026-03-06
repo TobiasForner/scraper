@@ -123,7 +123,9 @@ def download(
         batches (bool, optional): specify whether the images belonging to each chapter should also be combined into a single file. Defaults to False.
     """
     if start < end and "HERE" not in url:
-        print(f"ERROR: Range is {start}-{end}, but the url does not contain 'HERE'!")
+        print(
+            f"ERROR: Range is {start}-{end}, but the url does not contain 'HERE'!"
+        )
         return
 
     target = DownloadTarget(
@@ -209,7 +211,9 @@ def dl_updates(name: str | None = None, batches: bool = False, limit: int = 6):
                         for ct in chapter_targets:
                             _ = chapter_ranges.add(ct.chapter)
 
-                        progress_bar.print(f"found target {it_name} {chapter_ranges}")
+                        progress_bar.print(
+                            f"found target {it_name} {chapter_ranges}"
+                        )
                         logger.debug(f"found target {it_name} {chapter_ranges}")
                         targets += chapter_targets
                 progress_bar.advance(task)
@@ -221,7 +225,9 @@ def dl_updates(name: str | None = None, batches: bool = False, limit: int = 6):
         logger.info("No updates found!")
 
 
-def __get_updates(name: str, prog: RangesProgress, max_new_count: int = 100000000):
+def __get_updates(
+    name: str, prog: RangesProgress, max_new_count: int = 100000000
+):
     logger = get_logger("__get_updates")
 
     if prog.dl_locations:
@@ -266,7 +272,9 @@ def next(name: str, n: int, num_threads: int = 6):
     )
 
 
-def __last_new_chapter(prog: RangesProgress, max_new_count: int = 10000000) -> int:
+def __last_new_chapter(
+    prog: RangesProgress, max_new_count: int = 10000000
+) -> int:
     base_url = prog.urls[-1]
     count = prog.end
 

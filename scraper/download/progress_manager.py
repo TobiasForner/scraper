@@ -63,7 +63,9 @@ class RangesProgressManager:
         progress_str = progress.model_dump_json()
         fIn = io.BytesIO(progress_str.encode("ascii"))
         with open(self.progress_file_location, "wb") as progress_file:
-            pyAesCrypt.encryptStream(fIn, progress_file, self.password, BUFFER_SIZE)
+            pyAesCrypt.encryptStream(
+                fIn, progress_file, self.password, BUFFER_SIZE
+            )
 
 
 class DynRangesProgUpdate:

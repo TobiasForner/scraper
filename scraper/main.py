@@ -1,10 +1,10 @@
 import typer
 
-from scraper.download.download import app as dl_typer
-from scraper.files.files import app as files_typer
 from scraper.adb.adb import app as adb_typer
-from scraper.img.img import app as img_typer
+from scraper.download.download import app as dl_typer
 from scraper.ebook.ebook import app as ebook_typer
+from scraper.files.files import app as files_typer
+from scraper.img.img import app as img_typer
 
 app = typer.Typer()
 app.add_typer(dl_typer, name="dl", help="Downloading files")

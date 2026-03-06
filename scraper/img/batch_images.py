@@ -58,7 +58,8 @@ def batch_images(
         batch = []
         while (
             pos < len(images)
-            and int(os.path.splitext(base_images[pos])[0]) < batch_count * threshold
+            and int(os.path.splitext(base_images[pos])[0])
+            < batch_count * threshold
         ):
             batch.append(images[pos])
             pos += 1
@@ -77,7 +78,9 @@ def store_images_as_batch(images: list[Path], output_file: str):
     remaining_images = [
         cv2.imread(str(image), cv2.COLOR_BGR2RGB) for image in images[1:]
     ]
-    remaining_images = [image for image in remaining_images if image is not None]
+    remaining_images = [
+        image for image in remaining_images if image is not None
+    ]
     try:
         montage.multi_append(remaining_images)
     except ValueError as e:
