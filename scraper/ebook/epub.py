@@ -27,7 +27,9 @@ def assemble(
     if book_size:
         for i in range(math.ceil(len(chapters) / book_size)):
             start_chapter = chapters[i * book_size]
-            end_chapter = chapters[min(len(chapters) - 1, (i + 1) * book_size - 1)]
+            end_chapter = chapters[
+                min(len(chapters) - 1, (i + 1) * book_size - 1)
+            ]
             chaps = chapters[i * book_size : (i + 1) * book_size]
             build_epub(
                 progress,
@@ -87,7 +89,9 @@ def get_html_text(
         content = soup.find("div", class_="episode-content")
     if content is None:
         return None
-    text = collapse_whitespace(content, chapter=chapter, remove_strings=remove_strings)
+    text = collapse_whitespace(
+        content, chapter=chapter, remove_strings=remove_strings
+    )
     return text
 
 
@@ -137,7 +141,9 @@ def collapse_whitespace(
             combined[-1] += f" {t}"
         else:
             combined.append(t)
-        last_finished = any(t.endswith(s) for s in sentence_end_patterns) or i == 0
+        last_finished = (
+            any(t.endswith(s) for s in sentence_end_patterns) or i == 0
+        )
 
     # assemble text
     text = f"<h1>Chapter {chapter}</h1>"
@@ -189,7 +195,9 @@ def build_epub(
     for chapter in chapters:
         chapter_title = f"chapter {chapter}"
         chapter_file = f"chapter{chapter}.xhtml"
-        c = epub.EpubHtml(title=chapter_title, file_name=chapter_file, lang="en")
+        c = epub.EpubHtml(
+            title=chapter_title, file_name=chapter_file, lang="en"
+        )
         content = get_html_text(
             progress=progress,
             name=name,

@@ -27,12 +27,16 @@ def adb_remove_chapter(name: str, chapter: int):
     remove_chapter_files_adb(name, chapter, pm)
 
 
-@app.command(help="Disable copying to your ADB device for one series based on 'name'")
+@app.command(
+    help="Disable copying to your ADB device for one series based on 'name'"
+)
 def no_copy(name: str):
     __set_copy(name, False)
 
 
-@app.command(help="Enable copying to your ADB device for one series based on 'name'")
+@app.command(
+    help="Enable copying to your ADB device for one series based on 'name'"
+)
 def do_copy(name: str):
     __set_copy(name, True)
 
@@ -67,7 +71,8 @@ def adb_copy(
         names = [
             name
             for name, progress in progress.progress_by_name.items()
-            if progress.download_type is DownloadType.images and progress.do_copy
+            if progress.download_type is DownloadType.images
+            and progress.do_copy
         ]
         if ask_for_each:
             ask_for_each = not typer.confirm(
@@ -86,7 +91,9 @@ def adb_copy(
         while loc.name == name:
             loc = Path(loc, "..").resolve()
         loc = Path(loc, name)
-        push_diff(name, source_dir=loc, device=device, confirmed=not ask_for_each)
+        push_diff(
+            name, source_dir=loc, device=device, confirmed=not ask_for_each
+        )
         ensure_nomedia_file_for_name(name, device=device)
 
 
@@ -121,7 +128,9 @@ def print_local_file_ranges_not_on_device(name: str, verbose: bool = False):
         names = progress.keys()
         for name in names:
             base_dir = progress[name].base_dir()
-            print_local_file_ranges_not_on_device_single(name, base_dir, verbose)
+            print_local_file_ranges_not_on_device_single(
+                name, base_dir, verbose
+            )
     else:
         base_dir = progress[name].base_dir()
         print_local_file_ranges_not_on_device_single(name, base_dir, verbose)
@@ -135,9 +144,13 @@ def ensure_nomedia():
 
 
 def files_on_device(name: str, device: Device) -> list[str]:
-    res = __shell_on_device(device=device, cmd=f"find {IMAGE_DIR}/{name} -type f")
+    res = __shell_on_device(
+        device=device, cmd=f"find {IMAGE_DIR}/{name} -type f"
+    )
     if res is None:
-        print(f"Failed to find files in directory {IMAGE_DIR}/{name} on device!")
+        print(
+            f"Failed to find files in directory {IMAGE_DIR}/{name} on device!"
+        )
         sys.exit(1)
     res_lines = res.split("\n")
     return res_lines
@@ -149,7 +162,9 @@ def remove_files_from_device(files: list[str], device: Device):
         _ = __shell_on_device(device=device, cmd=f"rm {file}")
 
 
-def remove_chapter_files_adb(name: str, chapter: int, pm: RangesProgressManager):
+def remove_chapter_files_adb(
+    name: str, chapter: int, pm: RangesProgressManager
+):
     remove_multi_chapter_files_adb(name=name, chapters=[chapter], pm=pm)
 
 
@@ -163,16 +178,22 @@ def remove_multi_chapter_files_adb(
     to_remove: list[str] = []
     for chapter in chapters:
         local_chapter_files = part[(name, chapter)]
-        to_remove += [str(p.relative_to(local_images_dir)) for p in local_chapter_files]
+        to_remove += [
+            str(p.relative_to(local_images_dir)) for p in local_chapter_files
+        ]
 
     device = get_device()
     images = files_on_device(name, device)
-    filtered_images = [image for image in images if image.split("/")[-1] in to_remove]
+    filtered_images = [
+        image for image in images if image.split("/")[-1] in to_remove
+    ]
     filtered_images.sort()
     remove_files_from_device(filtered_images, device=device)
 
 
-def local_files_not_on_device(name: str, base_dir: Path, device: Device) -> list[Path]:
+def local_files_not_on_device(
+    name: str, base_dir: Path, device: Device
+) -> list[Path]:
     """List of file paths corresponding to images not on the device
 
     Args:
@@ -186,29 +207,39 @@ def local_files_not_on_device(name: str, base_dir: Path, device: Device) -> list
     local_images_dir = base_dir / "downloaded_images"
     local_files = images_in_dir(local_images_dir)
     on_device = [
-        f.replace(f"{IMAGE_DIR}/{name}/", "") for f in files_on_device(name, device)
+        f.replace(f"{IMAGE_DIR}/{name}/", "")
+        for f in files_on_device(name, device)
     ]
 
     diff = [
-        f for f in local_files if str(f.relative_to(local_images_dir)) not in on_device
+        f
+        for f in local_files
+        if str(f.relative_to(local_images_dir)) not in on_device
     ]
     return diff
 
 
 def ensure_nomedia_file_for_name(name: str, device: Device):
     on_device = [
-        f.replace(f"{IMAGE_DIR}/{name}/", "") for f in files_on_device(name, device)
+        f.replace(f"{IMAGE_DIR}/{name}/", "")
+        for f in files_on_device(name, device)
     ]
     if ".nomedia" not in on_device:
         print(f".nomedia file missing for {name}")
-        _ = __shell_on_device(device=device, cmd=f"touch {IMAGE_DIR}/{name}/.nomedia")
+        _ = __shell_on_device(
+            device=device, cmd=f"touch {IMAGE_DIR}/{name}/.nomedia"
+        )
         print(f"Created .nomedia file for {name}")
         print(f"Renaming {name} and reverting name change...")
         real_name_dir = f"{IMAGE_DIR}/{name}"
         mod_name_dir = f"{IMAGE_DIR}/{name}_old"
-        _ = __shell_on_device(device=device, cmd=f"mv {real_name_dir} {mod_name_dir}")
+        _ = __shell_on_device(
+            device=device, cmd=f"mv {real_name_dir} {mod_name_dir}"
+        )
         time.sleep(2)
-        _ = __shell_on_device(device=device, cmd=f"mv {mod_name_dir} {real_name_dir}")
+        _ = __shell_on_device(
+            device=device, cmd=f"mv {mod_name_dir} {real_name_dir}"
+        )
 
 
 def ensure_nomedia_file():
@@ -267,7 +298,9 @@ def get_device() -> Device:
         return get_device_from_client(client)
 
 
-def push_diff(name: str, source_dir: Path, device: Device, confirmed: bool = False):
+def push_diff(
+    name: str, source_dir: Path, device: Device, confirmed: bool = False
+):
     diff = local_files_not_on_device(name, source_dir, device=device)
     if not diff:
         print("No new items for", name, source_dir, source_dir)
@@ -292,7 +325,9 @@ def push_diff(name: str, source_dir: Path, device: Device, confirmed: bool = Fal
         try:
             device.push(str(src.absolute()), f"{dst_dir}/{f.name}")
         except RuntimeError as re:
-            print(f"Could not push {src.absolute()} to {dst_dir}/{f.name}: {re}")
+            print(
+                f"Could not push {src.absolute()} to {dst_dir}/{f.name}: {re}"
+            )
 
 
 def names_on_device(device: Device):

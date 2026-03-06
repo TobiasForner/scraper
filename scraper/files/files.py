@@ -38,7 +38,9 @@ def copy_files(target_directory: str, verbose: bool = False):
             target_directory, prog.name, "downloaded_images"
         ).resolve()
         target_for_name.mkdir(parents=True, exist_ok=True)
-        _, improved_images = group_images([p.resolve() for p in downloaded_images])
+        _, improved_images = group_images(
+            [p.resolve() for p in downloaded_images]
+        )
         for p in improved_images:
             p = Path(p)
             target_image = Path(target_for_name, p.name)
@@ -112,7 +114,9 @@ def del_blocked_chapters(name: str):
         remove_chapter(name, chapter, pm=pm)
 
 
-@app.command(help="Delete a specified chapter of a series (specified by 'name')")
+@app.command(
+    help="Delete a specified chapter of a series (specified by 'name')"
+)
 def remove_local_chapter(name: str, chapter: int):
     print(f"{chapter:04d}")
     pm = RangesProgressManager()

@@ -39,7 +39,9 @@ class RangesProgress(BaseModel):
             # move dl_location to the back
             pos = self.dl_locations.index(dl_location)
             self.dl_locations = (
-                self.dl_locations[:pos] + self.dl_locations[pos + 1 :] + [dl_location]
+                self.dl_locations[:pos]
+                + self.dl_locations[pos + 1 :]
+                + [dl_location]
             )
         return self.ranges.add(chapter)
 
