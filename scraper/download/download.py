@@ -76,7 +76,10 @@ class DownloadTarget:
 
 
 @app.command(
-    help="Downloads images from a range of URLs and arranges them in a single png file for each URL."
+    help=(
+        "Downloads images from a range of URLs and"
+        " arranges them in a single png file for each URL."
+    )
 )
 def download(
     url: str,
@@ -97,7 +100,8 @@ def download(
             help=(
                 "Prefix used to place the files in."
                 "Images are placed as <out_directory_prefix>/<name>/downloaded"
-                " images (single images) and out_directory_prefix/name/name for the batched images."
+                " images (single images) and out_directory_prefix/name/name for"
+                " the batched images."
             )
         ),
     ] = platformdirs.user_data_path("scraper", "TF"),
@@ -120,12 +124,11 @@ def download(
         out_directory_prefix (str, optional): Prefix used to place the files in. Images
             are placed as out_directory_prefix/name/downloaded images (single images)
             and out_directory_prefix/name/name for the batched images..
-        batches (bool, optional): specify whether the images belonging to each chapter should also be combined into a single file. Defaults to False.
+        batches (bool, optional): specify whether the images belonging to each chapter
+            should also be combined into a single file. Defaults to False.
     """
     if start < end and "HERE" not in url:
-        print(
-            f"ERROR: Range is {start}-{end}, but the url does not contain 'HERE'!"
-        )
+        print(f"ERROR: Range is {start}-{end}, but the url does not contain 'HERE'!")
         return
 
     target = DownloadTarget(
@@ -141,7 +144,12 @@ def download(
     progress = progress_manager.load_progress()
     if name in progress.progress_by_name:
         confirm = typer.confirm(
-            f"There is a progress item with the name {name}. The information could be overwritten. If this is the same item consider using the 'next' command instead. Should I continue?"
+            (
+                f"There is a progress item with the name {name}."
+                " The information could be overwritten."
+                " If this is the same item consider using the 'next' command instead."
+                " Should I continue?"
+            )
         )
         if not confirm:
             sys.exit(0)
@@ -211,9 +219,7 @@ def dl_updates(name: str | None = None, batches: bool = False, limit: int = 6):
                         for ct in chapter_targets:
                             _ = chapter_ranges.add(ct.chapter)
 
-                        progress_bar.print(
-                            f"found target {it_name} {chapter_ranges}"
-                        )
+                        progress_bar.print(f"found target {it_name} {chapter_ranges}")
                         logger.debug(f"found target {it_name} {chapter_ranges}")
                         targets += chapter_targets
                 progress_bar.advance(task)
@@ -225,9 +231,7 @@ def dl_updates(name: str | None = None, batches: bool = False, limit: int = 6):
         logger.info("No updates found!")
 
 
-def __get_updates(
-    name: str, prog: RangesProgress, max_new_count: int = 100000000
-):
+def __get_updates(name: str, prog: RangesProgress, max_new_count: int = 100000000):
     logger = get_logger("__get_updates")
 
     if prog.dl_locations:
@@ -272,9 +276,7 @@ def next(name: str, n: int, num_threads: int = 6):
     )
 
 
-def __last_new_chapter(
-    prog: RangesProgress, max_new_count: int = 10000000
-) -> int:
+def __last_new_chapter(prog: RangesProgress, max_new_count: int = 10000000) -> int:
     base_url = prog.urls[-1]
     count = prog.end
 
@@ -322,7 +324,11 @@ def __url_is_valid(url: str) -> bool:
     invalid_phrases = (
         "This chapter is premium!",
         "Premium Chapter",
-        "Sorry for the inconvenience. We&rsquo;re performing some maintenance at the moment. If you need to you can always follow us on ",
+        (
+            "Sorry for the inconvenience."
+            " We&rsquo;re performing some maintenance at the moment."
+            " If you need to you can always follow us on "
+        ),
         "is required to read this chapter",
     )
     if "blank" in url:
@@ -350,7 +356,9 @@ def download_targets(
     batches: bool = False,
     num_threads: int = 6,
 ):
-    """Download the files for the specified targets. Also updates the progress file and urls.json file. Images belonging to the same chapter are merged if batches=True.
+    """Download the files for the specified targets.
+    Also updates the progress file and urls.json file.
+    Images belonging to the same chapter are merged if batches=True.
 
     Args:
         targets (list[DownloadTarget]): list of targets
@@ -383,7 +391,10 @@ def download_targets(
                 )
             else:
                 print(
-                    f"Only got {len(image_result.image_locations)} images for {target.name} {target.chapter}. Not logging as downloaded."
+                    (
+                        f"Only got {len(image_result.image_locations)} images for"
+                        f" {target.name} {target.chapter}. Not logging as downloaded."
+                    )
                 )
         elif target.download_type is DownloadType.text:
             _ = scrape_text(
@@ -410,7 +421,6 @@ def download_targets(
                 out_directory = target.target_dir
                 out_directory.mkdir(exist_ok=True)
 
-                # TODO: make collect_images_single and collect_text have the same signature, then these two can be simplified by changing only the collection function
                 scraping_function = collect_images_single
                 if target.download_type is DownloadType.text:
                     scraping_function = scrape_text
@@ -435,16 +445,22 @@ def download_targets(
                             )
                     return " " + ", ".join(running_parts)
 
+                def finished_info(finished_count: int):
+                    return f"finished {finished_count}/{len(fut_results)}"
+
                 finished_count = 0
                 task = progress.add_task(
-                    f"Currently downloading... (finished {finished_count}/{len(fut_results)})",
+                    f"Currently downloading... ({finished_info(finished_count)})",
                     total=len(fut_results),
                 )
 
                 def update_text(last_finished: str):
                     progress.update(
                         task,
-                        description=f"Downloading{running_info()}... (finished {finished_count}/{len(fut_results)}){last_finished}",
+                        description=(
+                            f"Downloading{running_info()}..."
+                            f" ({finished_info(finished_count)}){last_finished}"
+                        ),
                     )
 
                 time.sleep(3)
@@ -462,7 +478,11 @@ def download_targets(
                             if len(image_locations) <= 1:
                                 valid_completion = False
                                 print(
-                                    f"Only found the following images: {image_locations} for {name} {chapter}, not logging as downloaded."
+                                    (
+                                        f"Only found the following images: "
+                                        f"{image_locations} for {name} {chapter},"
+                                        " not logging as downloaded."
+                                    )
                                 )
                         case TextResult(name, chapter):
                             dl_type = DownloadType.text
@@ -512,7 +532,8 @@ def fill_gaps(
 
     def targets_for_name(name: str) -> list[DownloadTarget]:
         """
-        Compute 'DownloadTarget's that represent the gaps in the downloaded chapters for 'name'
+        Compute 'DownloadTarget's that represent the gaps
+        in the downloaded chapters for 'name'
         """
         prog = progress.progress_by_name[name]
         res: list[DownloadTarget] = []
@@ -572,7 +593,10 @@ def __check_for_updates(name: str, prog: RangesProgress):
         print(f"{name}: No new chapters available from {prog.urls[-1]}")
     else:
         print(
-            f"{name}: available until {upd.end} (downloaded until {prog.end}) from {upd.url}"
+            (
+                f"{name}: available until {upd.end} "
+                f"(downloaded until {prog.end}) from {upd.url}"
+            )
         )
 
 
@@ -594,20 +618,39 @@ def summary():
 
     print(summary_lengths)
     line_width = sum(summary_lengths) + 4 * 2 + 5
-    inner_hor_line = f"├─{'─' * summary_lengths[0]}─┼─{'─' * summary_lengths[1]}─┼─{'─' * summary_lengths[2]}─┼─{'─' * summary_lengths[3]}─┤"
+    inner_hor_line = (
+        f"├─{'─' * summary_lengths[0]}"
+        f"─┼─{'─' * summary_lengths[1]}"
+        f"─┼─{'─' * summary_lengths[2]}"
+        f"─┼─{'─' * summary_lengths[3]}─┤"
+    )
 
     lines = [
         f"┌{'─' * (line_width - 2)}┐",
-        f"│ {'name'.ljust(summary_lengths[0])} │ {'ranges'.ljust(summary_lengths[1])} │ stopped │ copy  │",
+        (
+            f"│ {'name'.ljust(summary_lengths[0])} "
+            f"│ {'ranges'.ljust(summary_lengths[1])}"
+            " │ stopped │ copy  │"
+        ),
     ]
     summary_info.sort(key=lambda i: i[0])
     for name, ranges, stopped, copy in summary_info:
         lines.append(inner_hor_line)
         lines.append(
-            f"│ {name.ljust(summary_lengths[0])} │ {ranges.ljust(summary_lengths[1])} │ {stopped.ljust(summary_lengths[2])} │ {copy.ljust(summary_lengths[3])} │"
+            (
+                f"│ {name.ljust(summary_lengths[0])} "
+                f"│ {ranges.ljust(summary_lengths[1])} "
+                f"│ {stopped.ljust(summary_lengths[2])} "
+                f"│ {copy.ljust(summary_lengths[3])} │"
+            )
         )
     lines.append(
-        f"└─{'─' * summary_lengths[0]}─┴─{'─' * summary_lengths[1]}─┴─{'─' * summary_lengths[2]}─┴─{'─' * summary_lengths[3]}─┘"
+        (
+            f"└─{'─' * summary_lengths[0]}"
+            f"─┴─{'─' * summary_lengths[1]}"
+            f"─┴─{'─' * summary_lengths[2]}"
+            f"─┴─{'─' * summary_lengths[3]}─┘"
+        )
     )
     print("\n".join(lines))
 
@@ -631,7 +674,10 @@ def show_dl(name: str | None = None, prog_loc: str | None = None):
 
 
 @app.command(
-    help="Stop new chapters for 'name' from being included in default download lists (e.g. in 'update' calls)"
+    help=(
+        "Stop new chapters for 'name' from being "
+        "included in default download lists (e.g. in 'update' calls)"
+    )
 )
 def stop(name: str):
     pm = RangesProgressManager()
@@ -645,7 +691,10 @@ def stop(name: str):
 
 
 @app.command(
-    help="Allow new chapters for 'name' to be included in default download lists (e.g. in 'update' calls)"
+    help=(
+        "Allow new chapters for 'name' to be included"
+        " in default download lists (e.g. in 'update' calls)"
+    )
 )
 def unstop(name: str):
     pm = RangesProgressManager()

@@ -121,9 +121,7 @@ def trim_black_border(image_path: Path):
 
 
 def is_blocked(image_path: Path) -> bool:
-    blocked_image_root = (
-        platformdirs.user_data_path("scraper", "TF") / "blocked_images"
-    )
+    blocked_image_root = platformdirs.user_data_path("scraper", "TF") / "blocked_images"
     blocked_image_root.mkdir(exist_ok=True)
     blocked_images = images_in_dir(blocked_image_root)
     if not blocked_images:

@@ -16,9 +16,7 @@ def list_empty_chapters(
         print("Empty chapters:")
         print(
             "\t"
-            + "\n\t".join(
-                [f"{name} {chapter}" for name, chapter in empty_chapters]
-            )
+            + "\n\t".join([f"{name} {chapter}" for name, chapter in empty_chapters])
         )
     else:
         print("No empty chapters!")

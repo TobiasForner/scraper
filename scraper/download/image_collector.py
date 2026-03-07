@@ -46,21 +46,18 @@ class ImageCollector:
         options = Options()
         self.__logger = get_logger("ImageCollector")
         options.add_argument("--headless")
-        # additional arguments and use of stealth found at https://stackoverflow.com/questions/68289474/selenium-headless-how-to-bypass-cloudflare-detection-using-selenium
+        # additional arguments and use of stealth found at
+        # https://stackoverflow.com/questions/68289474/selenium-headless-how-to-bypass-cloudflare-detection-using-selenium # noqa: E501
         options.add_argument("start-maximized")
-        options.add_experimental_option(
-            "excludeSwitches", ["enable-automation"]
-        )
+        options.add_experimental_option("excludeSwitches", ["enable-automation"])
         options.add_experimental_option("useAutomationExtension", False)
 
         options.binary_location = "C:\\chromedriver\\chrome.exe"
         options.add_argument("user-agent=Chrome/110.0.3029.110")
         # used to hide console output from chrome
-        # see https://stackoverflow.com/questions/53372520/python-how-to-hide-output-chrome-messages-in-selenium
+        # see https://stackoverflow.com/questions/53372520/python-how-to-hide-output-chrome-messages-in-selenium # noqa: E501
         options.add_experimental_option("excludeSwitches", ["enable-logging"])
-        service = ChromeService(
-            executable_path="C:\\chromedriver\\chromedriver.exe"
-        )
+        service = ChromeService(executable_path="C:\\chromedriver\\chromedriver.exe")
         self.browser = webdriver.Chrome(options=options, service=service)
         self.downloaded: list[Path] = []
         self.found_image_urls: list[str] = []
@@ -86,9 +83,7 @@ class ImageCollector:
         time.sleep(5)
 
         self.browser.maximize_window()
-        height = self.browser.execute_script(
-            "return document.body.scrollHeight"
-        )
+        height = self.browser.execute_script("return document.body.scrollHeight")
         max_step = int(height)
         window_size = self.browser.get_window_size()
         step = window_size["height"] // 10
@@ -107,9 +102,7 @@ class ImageCollector:
                 time.sleep(5)
 
             time.sleep(0.2)
-            height = self.browser.execute_script(
-                "return document.body.scrollHeight"
-            )
+            height = self.browser.execute_script("return document.body.scrollHeight")
             max_step = int(height)
             current = next_s
         self.download_images()
@@ -121,16 +114,17 @@ class ImageCollector:
         images2 = self.browser.find_elements(By.CSS_SELECTOR, "div > img")
         images3 = self.browser.find_elements(By.CSS_SELECTOR, "a > img")
         self.__logger.debug(
-            f"selected elements: {[im.get_property('src') for im in images]}; {[im.get_property('src') for im in images2]}"
+            (
+                f"selected elements: {[im.get_property('src') for im in images]}; "
+                f"{[im.get_property('src') for im in images2]}"
+            )
         )
         if len(images2) > len(images):
             images = images2
         if len(images3) > len(images):
             images = images3
 
-        image_names = ImageNames(
-            self.name, self.batch_number, self.out_directory
-        )
+        image_names = ImageNames(self.name, self.batch_number, self.out_directory)
 
         im_sources: list[str] = []
         for im in images:
@@ -171,24 +165,23 @@ class ImageCollector:
                 # check whether file is too large
                 image = cv2.imread(str(file_name))
                 if image is None:
-                    self.__logger.info(
-                        f"Could not load downloaded file {file_name}"
-                    )
+                    self.__logger.info(f"Could not load downloaded file {file_name}")
                     return
                 height = image.shape[0]
                 if height >= SPLIT_THRESHOLD:
                     file_name2 = image_names.next(extension)
                     self.__logger.debug(
-                        f"Splitting image {file_name} into {file_name} and {file_name2}."
+                        (
+                            f"Splitting image {file_name} into"
+                            f" {file_name} and {file_name2}."
+                        )
                     )
                     split_loaded_image(image, file_name, file_name2)
                 else:
                     self.downloaded.append(file_name)
 
             else:
-                print(
-                    f"Image Couldn't be retrieved from {url}: {res.status_code}"
-                )
+                print(f"Image Couldn't be retrieved from {url}: {res.status_code}")
                 print("Attempting Screenshot")
                 file_name = image_names.next(extension=".png")
                 self.found_image_urls.append(url)

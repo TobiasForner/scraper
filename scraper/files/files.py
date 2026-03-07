@@ -1,5 +1,4 @@
 import json
-import os
 import shutil
 from pathlib import Path
 
@@ -27,7 +26,7 @@ def copy_files(target_directory: str, verbose: bool = False):
     if copy_progress_loc.exists():
         with open(copy_progress_loc) as copy_prog_file:
             copy_progress = json.load(copy_prog_file)
-    copied_to = copy_progress.get("copied_to", [])
+    copied_to: list[str] = copy_progress.get("copied_to", [])
 
     for prog in progress.progress_by_name.values():
         downloaded_images: list[Path] = []
@@ -38,9 +37,7 @@ def copy_files(target_directory: str, verbose: bool = False):
             target_directory, prog.name, "downloaded_images"
         ).resolve()
         target_for_name.mkdir(parents=True, exist_ok=True)
-        _, improved_images = group_images(
-            [p.resolve() for p in downloaded_images]
-        )
+        _, improved_images = group_images([p.resolve() for p in downloaded_images])
         for p in improved_images:
             p = Path(p)
             target_image = Path(target_for_name, p.name)
@@ -77,7 +74,10 @@ def move_files(source_dir: Path, target_dir: Path):
 
 
 @app.command(
-    help="Helper command to ensure that stored download directories follow the current convention"
+    help=(
+        "Helper command to ensure that stored download directories "
+        "follow the current convention"
+    )
 )
 def normalize_dl_dirs():
     pm = RangesProgressManager()
@@ -95,7 +95,10 @@ def normalize_dl_dirs():
 
 
 @app.command(
-    help="Shows a list of chapters of a series (specified by 'name') where the download has been blocked."
+    help=(
+        "Shows a list of chapters of a series (specified by 'name') "
+        "where the download has been blocked."
+    )
 )
 def list_blocked_chapters(name: str):
     pm = RangesProgressManager()
@@ -104,7 +107,11 @@ def list_blocked_chapters(name: str):
 
 
 @app.command(
-    help="Deletes all local chapters of a series (specified by 'name') whose the download has been blocked. Successfully downloaded chapters are not affected"
+    help=(
+        "Deletes all local chapters of a series (specified by 'name') "
+        "whose the download has been blocked. "
+        "Successfully downloadedchapters are not affected"
+    )
 )
 def del_blocked_chapters(name: str):
     pm = RangesProgressManager()
@@ -114,9 +121,7 @@ def del_blocked_chapters(name: str):
         remove_chapter(name, chapter, pm=pm)
 
 
-@app.command(
-    help="Delete a specified chapter of a series (specified by 'name')"
-)
+@app.command(help="Delete a specified chapter of a series (specified by 'name')")
 def remove_local_chapter(name: str, chapter: int):
     print(f"{chapter:04d}")
     pm = RangesProgressManager()
@@ -124,7 +129,11 @@ def remove_local_chapter(name: str, chapter: int):
 
 
 @app.command(
-    help="Delete all local and adb chapters of a series (specified by 'name') whose the download has been blocked. Successfully downloaded chapters are not affected"
+    help=(
+        "Delete all local and adb chapters of a series (specified by 'name') "
+        "whose the download has been blocked. "
+        "Successfully downloaded chapters are not affected"
+    )
 )
 @app.command()
 def full_del_blocked_chapters(name: str):
@@ -136,9 +145,15 @@ def full_del_blocked_chapters(name: str):
         remove_chapter(name, chapter, pm=pm)
 
 
-app.command(
-    help="List all empty chapters of a series (emptiness is determined if less than 'threshold') files have been downloaded",
+_ = app.command(
+    help=(
+        "List all empty chapters of a series"
+        " (emptiness is determined if less than 'threshold' files have been downloaded)"
+    ),
 )(empty_chapters.list_empty_chapters)
-app.command(
-    help="Delete all empty chapters of a series (emptiness is determined if less than 'threshold') files have been downloaded",
+_ = app.command(
+    help=(
+        "Delete all empty chapters of a series"
+        " (emptiness is determined if less than 'threshold' files have been downloaded)"
+    ),
 )(empty_chapters.remove_empty_chapters)

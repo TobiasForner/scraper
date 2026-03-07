@@ -33,14 +33,13 @@ def images_in_dir(directory: Path) -> list[Path]:
     return files_in_dir(directory, [".png", ".jpeg", ".jpg"])
 
 
-def files_in_dir(
-    directory: Path, extensions: list[str] | None = None
-) -> list[Path]:
+def files_in_dir(directory: Path, extensions: list[str] | None = None) -> list[Path]:
     """Get a list of files directly contained in a directory
 
     Args:
         directory: directory root to search
-        extensions: extensions (with leading dot, i.e. '.txt') to include. Use 'None' to obtain all files
+        extensions: extensions (with leading dot, i.e. '.txt') to include.
+        Use 'None' to obtain all files
 
     Returns: list of paths of the found files
 
@@ -48,9 +47,7 @@ def files_in_dir(
     res: list[Path] = []
     path = Path(directory).resolve()
     for element in path.iterdir():
-        if element.is_file() and (
-            not extensions or element.suffix in extensions
-        ):
+        if element.is_file() and (not extensions or element.suffix in extensions):
             res.append(element)
     return res
 
@@ -64,7 +61,8 @@ def partition_improved_images(
         images (list[Path]): image paths to consider
 
     Returns:
-        dict[tuple[str, int], list[Path]]: dict that maps (name, chapter) to the corresponding list of file paths
+        dict[tuple[str, int], list[Path]]: dict that maps (name, chapter) to the
+        corresponding list of file paths
     """
     batch_to_images = defaultdict(list)
     for image in images:

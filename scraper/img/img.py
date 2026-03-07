@@ -93,9 +93,7 @@ def split_images(directory: str):
             if should_split(image):
                 name1 = image_names.next(extension=extension)
                 name2 = image_names.next(extension=extension)
-                split_loaded_image(
-                    image=image, out_loc_1=name1, out_loc_2=name2
-                )
+                split_loaded_image(image=image, out_loc_1=name1, out_loc_2=name2)
             else:
                 cv2.imwrite(str(image_names.next(extension=extension)), image)
 
