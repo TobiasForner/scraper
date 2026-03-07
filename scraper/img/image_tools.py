@@ -3,6 +3,7 @@ from pathlib import Path
 import cv2
 import numpy as np
 import platformdirs
+from cv2.typing import MatLike
 
 from scraper.download.progress_manager import RangesProgressManager
 from scraper.files.util import (
@@ -24,10 +25,10 @@ def image_split(image: str | Path) -> tuple[str, int, str] | None:
 
 def images_above_threshold(directory: Path) -> list[Path]:
     ims = images_in_dir(directory)
-    res = []
+    res: list[Path] = []
     for im in ims:
-        im = str(im.resolve())
-        lim = cv2.imread(im)
+        im = im.resolve()
+        lim = cv2.imread(str(im))
         if lim is None:
             continue
         if should_split(lim):
@@ -80,44 +81,44 @@ def trim_black_border(image_path: Path):
     height, _, _ = image.shape
     pos = 0
 
-    def is_black_line(line: int) -> bool:
+    def is_black_line(line: int, image: MatLike) -> bool:
         arr = image[line] == 14
         res = arr.all(1).all()
         return res
 
     # trim top
-    while pos < height and is_black_line(pos):
+    while pos < height and is_black_line(pos, image):
         pos += 1
     image = image[pos:]
 
     # trim bottom
     height, _, _ = image.shape
     pos = height - 1
-    while pos > 0 and is_black_line(pos):
+    while pos > 0 and is_black_line(pos, image):
         pos -= 1
     image = image[:pos]
 
     height, width, _ = image.shape
 
-    def is_black_col(col: int) -> bool:
+    def is_black_col(col: int, image: MatLike) -> bool:
         arr = image[:, col] == 14
-        res = arr.all(1).all()
+        res: bool = arr.all(1).all()
 
         return res
 
     # trim left
     pos = 0
-    while pos < width and is_black_col(pos):
+    while pos < width and is_black_col(pos, image):
         pos += 1
     image = image[:, pos:]
 
     # trim right
     height, width, _ = image.shape
     pos = width - 1
-    while pos > 0 and is_black_col(pos):
+    while pos > 0 and is_black_col(pos, image):
         pos -= 1
     image = image[:, :pos]
-    cv2.imwrite(str(image_path), image)
+    _ = cv2.imwrite(str(image_path), image)
 
 
 def is_blocked(image_path: Path) -> bool:
@@ -132,6 +133,8 @@ def is_blocked(image_path: Path) -> bool:
     test_image_cut = test_image[:500]
     for blocked_image_path in blocked_images:
         blocked_image_cut = cv2.imread(str(blocked_image_path))
+        if blocked_image_cut is None:
+            continue
         if (
             blocked_image_cut.shape == test_image_cut.shape
             and (blocked_image_cut == test_image_cut).all()

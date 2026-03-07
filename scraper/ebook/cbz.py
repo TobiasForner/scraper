@@ -7,8 +7,8 @@ from scraper.files.util import files_in_dir, images_in_dir
 
 
 def cbz_chapter_images(name: str, chapter: int, pm: RangesProgressManager):
-    progress = pm.load_progress()
-    progress_by_name = progress.progress_by_name
+    all_progress = pm.load_progress()
+    progress_by_name = all_progress.progress_by_name
     if name in progress_by_name:
         progress = progress_by_name[name]
         loc = progress.base_dir()
@@ -36,8 +36,8 @@ def cbz_chapter_images(name: str, chapter: int, pm: RangesProgressManager):
 
 def cbz_remaining(name: str, pm: RangesProgressManager):
     """Convert all chapters for 'name' to cbz files for which no cbz file is present"""
-    progress = pm.load_progress()
-    progress_by_name = progress.progress_by_name
+    all_progress = pm.load_progress()
+    progress_by_name = all_progress.progress_by_name
     if name in progress_by_name:
         progress = progress_by_name[name]
         cbz_dir = progress.base_dir() / "cbz"
@@ -53,8 +53,8 @@ def cbz_remaining(name: str, pm: RangesProgressManager):
 
 
 def __convert_to_cbz(name: str, chapter: int, pm: RangesProgressManager):
-    progress = pm.load_progress()
-    progress_by_name = progress.progress_by_name
+    all_progress = pm.load_progress()
+    progress_by_name = all_progress.progress_by_name
     if name in progress_by_name:
         progress = progress_by_name[name]
         loc = progress.base_dir()

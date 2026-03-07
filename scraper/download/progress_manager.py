@@ -4,7 +4,7 @@ from logging import Logger
 from pathlib import Path
 
 import platformdirs
-import pyAesCrypt
+import pyAesCrypt  # type: ignore[import-untyped]
 import typer
 
 from scraper.download.download_progress import AllProgress, DownloadType
@@ -34,7 +34,7 @@ class RangesProgressManager:
         if password:
             self.password: str = password
         else:
-            self.password: str = typer.prompt(
+            self.password = typer.prompt(
                 (
                     "Please enter the encryption password "
                     f"for {self.progress_file_location}"

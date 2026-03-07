@@ -4,13 +4,13 @@ import sys
 import time
 from collections import defaultdict
 from concurrent.futures import Future, ThreadPoolExecutor, as_completed
+from dataclasses import dataclass
 from pathlib import Path
-from typing import Annotated
+from typing import Annotated, Protocol
 
 import platformdirs
 import requests
 import typer
-from attr import dataclass
 from rich.progress import Progress
 
 from scraper.download.download_progress import DownloadType, RangesProgress
@@ -416,27 +416,38 @@ def download_targets(
     else:
         fut_results: list[Future[ImageResult | TextResult]] = []
 
+        class DataScraper(Protocol):
+            def __call__(  # noqa: E704
+                self,
+                name: str,
+                chapter: int,
+                url: str,
+                dl_location: Path,
+                skip_download: bool,
+                /,
+            ) -> ImageResult | TextResult: ...
+
         with ThreadPoolExecutor(num_threads) as executor:
             for target in targets:
                 out_directory = target.target_dir
                 out_directory.mkdir(exist_ok=True)
 
-                scraping_function = collect_images_single
+                scraping_function: DataScraper = collect_images_single
                 if target.download_type is DownloadType.text:
                     scraping_function = scrape_text
-                fut_results.append(
-                    executor.submit(
-                        scraping_function,
-                        target.name,
-                        target.chapter,
-                        target.url,
-                        target.target_dir,
-                    )
+                future_res: Future[ImageResult | TextResult] = executor.submit(
+                    scraping_function,
+                    target.name,
+                    target.chapter,
+                    target.url,
+                    target.target_dir,
+                    False,
                 )
+                fut_results.append(future_res)
 
             with Progress(transient=True) as progress:
                 # updates text in progress bar
-                def running_info():
+                def running_info() -> str:
                     running_parts: list[str] = []
                     for index, fut in enumerate(fut_results):
                         if fut.running():
@@ -601,7 +612,7 @@ def __check_for_updates(name: str, prog: RangesProgress):
 
 
 @app.command(help="Print a summary table of all downloaded chapters")
-def summary():
+def summary() -> None:
     pm = RangesProgressManager()
     progress = pm.load_progress()
     # name, ranges, stopped, copy

@@ -6,7 +6,7 @@ import bs4
 import platformdirs
 from bs4 import BeautifulSoup, Tag
 from bs4.element import NavigableString, PageElement
-from ebooklib import epub
+from ebooklib import epub  # type: ignore[import-untyped]
 from pydantic import BaseModel
 
 from scraper.download.download_progress import RangesProgress
@@ -17,8 +17,8 @@ def assemble(
     name: str, chapters: list[int] | None = None, book_size: int | None = None
 ):
     progress_manager = RangesProgressManager()
-    progress = progress_manager.load_progress()
-    progress = progress.progress_by_name[name]
+    all_progress = progress_manager.load_progress()
+    progress = all_progress.progress_by_name[name]
     if chapters is None:
         chapters = list(progress.chapters())
         chapters.sort()

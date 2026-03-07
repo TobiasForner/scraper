@@ -4,6 +4,7 @@ import sys
 from pathlib import Path
 
 import cv2
+from cv2.typing import MatLike
 from PIL import Image
 
 from scraper.files.util import partition_improved_images
@@ -77,9 +78,11 @@ def store_images_as_batch(images: list[Path], output_file: str):
     remaining_images = [
         cv2.imread(str(image), cv2.COLOR_BGR2RGB) for image in images[1:]
     ]
-    remaining_images = [image for image in remaining_images if image is not None]
+    remaining_images_success: list[MatLike] = [
+        image for image in remaining_images if image is not None
+    ]
     try:
-        montage.multi_append(remaining_images)
+        montage.multi_append(remaining_images_success)
     except ValueError as e:
         print(e)
         sys.exit(1)

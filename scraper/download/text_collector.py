@@ -11,7 +11,9 @@ class TextResult:
     out_directory: Path
 
 
-def scrape_text(name: str, chapter: int, url: str, dl_location: Path):
+def scrape_text(
+    name: str, chapter: int, url: str, dl_location: Path, _skip_download: bool = False
+):
     res = requests.get(url)
     dl_location.mkdir(parents=True, exist_ok=True)
     with open(Path(dl_location, f"{name}_{chapter}.txt"), "w", encoding="utf-8") as f:

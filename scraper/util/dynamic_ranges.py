@@ -65,7 +65,7 @@ class Ranges(BaseModel):
         self.ranges = new_ranges
         return res
 
-    def __merge_ranges(self):
+    def __merge_ranges(self) -> None:
         self.ranges.sort(key=lambda r: r.start)
         new_ranges: list[IntRange] = []
         last_range = self.ranges[0]

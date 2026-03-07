@@ -2,16 +2,18 @@ import os
 import shutil
 import time
 from contextlib import contextmanager
+from dataclasses import dataclass
 from pathlib import Path
 
 import cv2
 import requests
-from attr import dataclass
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.chrome.service import Service as ChromeService
 from selenium.webdriver.common.by import By
-from selenium_stealth import stealth
+from selenium_stealth import (  # type: ignore[import-untyped]  # pyright: ignore[reportMissingTypeStubs]  # noqa: E501
+    stealth,
+)
 
 from scraper.download.image_names import ImageNames
 from scraper.img.image_tools import (
@@ -108,7 +110,7 @@ class ImageCollector:
         self.download_images()
         self.__logger.debug(f"end {url}")
 
-    def download_images(self):
+    def download_images(self) -> None:
         self.__logger.debug("start locate elements")
         images = self.browser.find_elements(By.CSS_SELECTOR, "p > img")
         images2 = self.browser.find_elements(By.CSS_SELECTOR, "div > img")

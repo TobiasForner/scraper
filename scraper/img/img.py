@@ -4,6 +4,7 @@ from pathlib import Path
 
 import cv2
 import typer
+from cv2.typing import MatLike
 from rich.progress import track
 
 from scraper.download.image_names import ImageNames
@@ -24,10 +25,12 @@ app = typer.Typer()
 @app.command()
 def batch(
     directory: str,
-    out_directory: str = ".",
+    out_directory: Path | None = None,
     threshold: int = 200,
     name: str = "",
 ):
+    if out_directory is None:
+        out_directory = Path()
     dir = Path(directory).resolve()
     images = images_in_dir(dir)
     if not images:
@@ -84,9 +87,11 @@ def split_images(directory: str):
     batch_to_images = partition_improved_images(res)
     for (name, chapter), images in batch_to_images.items():
         # load all images
-        images = [(image, cv2.imread(str(image))) for image in images]
+        read_images: list[tuple[Path, MatLike | None]] = [
+            (image, cv2.imread(str(image))) for image in images
+        ]
         image_names = ImageNames(name, chapter, directory=dir)
-        for path, image in images:
+        for path, image in read_images:
             if image is None:
                 continue
             extension = os.path.splitext(path)[1]
@@ -95,7 +100,7 @@ def split_images(directory: str):
                 name2 = image_names.next(extension=extension)
                 split_loaded_image(image=image, out_loc_1=name1, out_loc_2=name2)
             else:
-                cv2.imwrite(str(image_names.next(extension=extension)), image)
+                _ = cv2.imwrite(str(image_names.next(extension=extension)), image)
 
 
 @app.command()

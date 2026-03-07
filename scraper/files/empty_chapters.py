@@ -34,16 +34,14 @@ def remove_empty_chapters(
 
 def __empty_chapters(
     name: str | None, threshold: int, pm: RangesProgressManager, verbose: bool
-) -> list[tuple[str, str]]:
-    res = []
-
+) -> list[tuple[str, int]]:
     if name is not None:
         return [
             (name, chapter)
             for chapter in __empty_chapters_for(name, threshold, pm, verbose)
         ]
 
-    res = []
+    res: list[tuple[str, int]] = []
     progress = pm.load_progress()
     for name in progress.progress_by_name:
         res += [
@@ -55,8 +53,8 @@ def __empty_chapters(
 
 def __empty_chapters_for(
     name: str, threshold: int, pm: RangesProgressManager, verbose: bool
-) -> list[str]:
-    res = []
+) -> list[int]:
+    res: list[int] = []
     progress = pm.load_progress()
     if name in progress.progress_by_name:
         prog = progress.progress_by_name[name]
@@ -73,8 +71,6 @@ def __empty_chapters_for(
                 if len(chapter_paths) <= threshold:
                     res.append(chapter)
             for chapter in prog.chapters():
-                chapter_string = f"{chapter:04d}"
-                if (name, chapter_string) not in image_partition:
-                    res.append(chapter_string)
-
+                if (name, chapter) not in image_partition:
+                    res.append(chapter)
     return res

@@ -1,5 +1,6 @@
 import cv2
 import numpy as np
+from cv2.typing import MatLike
 
 
 class Montage(object):
@@ -17,7 +18,7 @@ class Montage(object):
         new_image = self.normalize_image(image)
         self.montage = np.concatenate((self.montage, new_image), 0)
 
-    def multi_append(self, images: list[np.ndarray]):
+    def multi_append(self, images: list[MatLike]):
         images = [self.normalize_image(im) for im in images]
         self.montage = np.concatenate([self.montage] + images, 0)
 

@@ -5,8 +5,10 @@ from collections import defaultdict
 from pathlib import Path
 
 import typer
-from ppadb.client import Client as AdbClient
-from ppadb.device import Device
+from ppadb.client import (  # type: ignore[import-untyped] # pyright: ignore[reportMissingTypeStubs];  # noqa: E501
+    Client as AdbClient,
+)
+from ppadb.device import Device  # type: ignore[import-untyped]
 from rich.progress import track
 
 from scraper.download.download_progress import DownloadType
@@ -50,7 +52,7 @@ def __set_copy(name: str, do_copy: bool):
 
 @app.command(name="copy", help="Copy files from PC to your phone via ADB")
 def adb_copy(
-    names: list[str] = typer.Argument([]),
+    names: list[str] = [],
     all: bool = False,
     ask_for_each: bool = False,
 ):
@@ -91,11 +93,9 @@ def adb_copy(
 
 
 @app.command(
-    help(
-        (
-            "Delete files belonging to chapters whose download"
-            " has been blocked by the source website from your ADB device"
-        )
+    help=(
+        "Delete files belonging to chapters whose download"
+        " has been blocked by the source website from your ADB device"
     )
 )
 def adb_del_blocked_chapters(name: str):
@@ -253,11 +253,7 @@ def get_device() -> Device:
     def get_device_from_client(client: AdbClient) -> Device:
         devices: list[Device] = (
             client.devices()
-        )  # pyright:ignore[reportUnknownMemberType]
-        if not devices:
-            devices = (
-                client.devices()
-            )  # pyright:ignore[reportUnknownMemberType, reportUnknownVariableType]
+        )  # pyright:ignore[reportUnknownMemberType, reportUnknownVariableType]
         if not devices:
             print("No devices found!")
             sys.exit(1)
