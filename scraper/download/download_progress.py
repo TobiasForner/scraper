@@ -25,7 +25,8 @@ class RangesProgress(BaseModel):
 
         Args:
             url (str): url used for the chapter download
-            dl_location (Path): base location for the downloaded files. Ends with name, not with downloaded_images
+            dl_location (Path): base location for the downloaded files.
+            Ends with name, not with downloaded_images
             chapter (int): chapter number
 
         Returns:
@@ -39,9 +40,7 @@ class RangesProgress(BaseModel):
             # move dl_location to the back
             pos = self.dl_locations.index(dl_location)
             self.dl_locations = (
-                self.dl_locations[:pos]
-                + self.dl_locations[pos + 1 :]
-                + [dl_location]
+                self.dl_locations[:pos] + self.dl_locations[pos + 1 :] + [dl_location]
             )
         return self.ranges.add(chapter)
 
@@ -97,7 +96,10 @@ class AllProgress(BaseModel):
 
             if prog.download_type is not dl_type:
                 print(
-                    f"ERROR: new download type {dl_type} does not match the existing one {prog.download_type}"
+                    (
+                        f"ERROR: new download type {dl_type} does not match"
+                        f" the existing one {prog.download_type}"
+                    )
                 )
                 return
             return prog.add(url, dl_location, chapter)

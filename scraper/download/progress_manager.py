@@ -35,7 +35,10 @@ class RangesProgressManager:
             self.password: str = password
         else:
             self.password: str = typer.prompt(
-                f"Please enter the encryption password for {self.progress_file_location}",
+                (
+                    "Please enter the encryption password "
+                    f"for {self.progress_file_location}"
+                ),
                 hide_input=True,
                 confirmation_prompt=False,
             )
@@ -63,9 +66,7 @@ class RangesProgressManager:
         progress_str = progress.model_dump_json()
         fIn = io.BytesIO(progress_str.encode("ascii"))
         with open(self.progress_file_location, "wb") as progress_file:
-            pyAesCrypt.encryptStream(
-                fIn, progress_file, self.password, BUFFER_SIZE
-            )
+            pyAesCrypt.encryptStream(fIn, progress_file, self.password, BUFFER_SIZE)
 
 
 class DynRangesProgUpdate:
@@ -91,10 +92,16 @@ class DynRangesProgUpdate:
         )
         if res:
             self.logger.debug(
-                f"DynRangesProgUpdate: Updating progress after completion of {name} {chapter}"
+                (
+                    "DynRangesProgUpdate: "
+                    f"Updating progress after completion of {name} {chapter}"
+                )
             )
             self.pm.store_progress(progress=progress)
         else:
             self.logger.debug(
-                f"DynRangesProgUpdate: NOT updating progress after completion of {name} {chapter}"
+                (
+                    "DynRangesProgUpdate: "
+                    f"NOT updating progress after completion of {name} {chapter}"
+                )
             )

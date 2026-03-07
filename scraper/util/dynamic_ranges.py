@@ -53,14 +53,10 @@ class Ranges(BaseModel):
                 res = True
                 if r.start == chapter:
                     if r.end > chapter:
-                        new_ranges.append(
-                            IntRange(start=chapter + 1, end=r.end)
-                        )
+                        new_ranges.append(IntRange(start=chapter + 1, end=r.end))
                 elif r.end == chapter:
                     if r.start < chapter:
-                        new_ranges.append(
-                            IntRange(start=r.start, end=chapter - 1)
-                        )
+                        new_ranges.append(IntRange(start=r.start, end=chapter - 1))
                 else:
                     new_ranges.append(IntRange(start=r.start, end=chapter - 1))
                     new_ranges.append(IntRange(start=chapter + 1, end=r.end))

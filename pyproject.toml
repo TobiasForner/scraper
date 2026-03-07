@@ -25,9 +25,14 @@ dependencies = [
 scrape = "scraper:main.app"
 
 [tool.black]
-line-length = 80
+line-length = 88
+
+[tool.ruff]
+line-length = 88
+[tool.ruff.lint]
+select = ["E501"]
 
 [tool.isort]
 profile = "black"
-line_length = 80
+line_length = 88
 src_paths = ["scraper"]
