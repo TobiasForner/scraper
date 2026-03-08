@@ -36,3 +36,6 @@ select = ["E501"]
 profile = "black"
 line_length = 88
 src_paths = ["scraper"]
+
+[tool.mypy]
+explicit_package_bases = true
