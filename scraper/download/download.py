@@ -65,7 +65,7 @@ class DownloadTarget:
         return [
             ChapterTarget(
                 self.name,
-                self.url.replace("Here", str(chapter)),
+                self.url.replace("Here", str(chapter)).replace("HERE", str(chapter)),
                 self.url,
                 chapter,
                 self.__download_dir(),
