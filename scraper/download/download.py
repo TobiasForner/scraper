@@ -430,7 +430,7 @@ def download_targets(
         with ThreadPoolExecutor(num_threads) as executor:
             for target in targets:
                 out_directory = target.target_dir
-                out_directory.mkdir(exist_ok=True)
+                out_directory.mkdir(exist_ok=True, parents=True)
 
                 scraping_function: DataScraper = collect_images_single
                 if target.download_type is DownloadType.text:
