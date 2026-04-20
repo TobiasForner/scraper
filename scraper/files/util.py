@@ -2,21 +2,31 @@ import re
 from collections import defaultdict
 from pathlib import Path
 
+from scraper.download.download_progress import DownloadType
 from scraper.download.progress_manager import (
     RangesProgressManager,
 )
 
 IMPROVED_PATTERN = re.compile(r"(.*)_(\d+)_\d+\.(jpeg|jpg|png|svg)")
 
+TEXT_FILE_PATTERN = re.compile(r"([a-zA-Z\-_]+)_(\d+)\.(txt)")
+
 
 def remove_chapter(name: str, chapter: int, pm: RangesProgressManager):
     progress = pm.load_progress()
     series_progress = progress.progress_by_name[name]
-    chapter_dir = series_progress.base_dir() / "downloaded_images"
-    local_files = images_in_dir(chapter_dir)
-    part = partition_improved_images(local_files)
-    for image in part[(name, chapter)]:
-        image.unlink()
+    if series_progress.download_type == DownloadType.text:
+        chapter_dir = series_progress.base_dir()
+        local_files = files_in_dir(chapter_dir, extensions=[".txt"])
+        text_part = partition_text_files(local_files)
+        if (name, chapter) in text_part:
+            text_part[(name, chapter)].unlink()
+    else:
+        chapter_dir = series_progress.base_dir() / "downloaded_images"
+        local_files = images_in_dir(chapter_dir)
+        part = partition_improved_images(local_files)
+        for image in part[(name, chapter)]:
+            image.unlink()
     progress.remove(name, chapter)
     pm.store_progress(progress=progress)
 
@@ -78,6 +88,27 @@ def partition_improved_images(
 
 def data_from_image_file_name(file_name: str) -> tuple[str, int, str] | None:
     m = IMPROVED_PATTERN.match(file_name)
+    if not m:
+        return None
+    name, chapter, ext = m.groups()
+    chapter = int(chapter)
+    return name, chapter, ext
+
+
+def partition_text_files(text_files: list[Path]) -> dict[tuple[str, int], Path]:
+    res = {}
+    for tf in text_files:
+        data = data_from_text_file_name(tf.name)
+        print(f"data: {data}")
+        if data is None:
+            continue
+        name, chapter, _ = data
+        res[(name, int(chapter))] = tf
+    return res
+
+
+def data_from_text_file_name(file_name: str) -> tuple[str, int, str] | None:
+    m = TEXT_FILE_PATTERN.match(file_name)
     if not m:
         return None
     name, chapter, ext = m.groups()

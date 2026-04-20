@@ -1,8 +1,10 @@
 from scraper.download.download_progress import DownloadType
 from scraper.download.progress_manager import RangesProgressManager
 from scraper.files.util import (
+    files_in_dir,
     images_in_dir,
     partition_improved_images,
+    partition_text_files,
     remove_chapter,
 )
 
@@ -54,11 +56,24 @@ def __empty_chapters(
 def __empty_chapters_for(
     name: str, threshold: int, pm: RangesProgressManager, verbose: bool
 ) -> list[int]:
+    empty_text_signifiers = ['<p class="error">此信息不存在</p>']
     res: list[int] = []
     progress = pm.load_progress()
     if name in progress.progress_by_name:
         prog = progress.progress_by_name[name]
         if prog.download_type is DownloadType.text:
+            text_files = files_in_dir(prog.base_dir(), extensions=[".txt"])
+            for (name, chapter), chapter_path in partition_text_files(
+                text_files
+            ).items():
+                text = ""
+                with open(chapter_path, encoding="utf-8") as f:
+                    text = f.read()
+                if any([ets in text for ets in empty_text_signifiers]):
+                    if verbose:
+                        print(f"{name} {chapter} is empty")
+                    res.append(chapter)
+
             return res
         if prog.has_base_dir():
             images = images_in_dir(prog.base_dir() / "downloaded_images")
