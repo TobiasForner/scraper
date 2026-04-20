@@ -87,6 +87,8 @@ def get_html_text(
     if content is None:
         content = soup.find("div", class_="episode-content")
     if content is None:
+        content = soup.find("div", class_="chapter-content")
+    if content is None:
         return None
     text = collapse_whitespace(content, chapter=chapter, remove_strings=remove_strings)
     return text

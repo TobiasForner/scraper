@@ -330,6 +330,7 @@ def __url_is_valid(url: str) -> bool:
             " If you need to you can always follow us on "
         ),
         "is required to read this chapter",
+        '<p class="error">此信息不存在</p>',
     )
     if "blank" in url:
         # blank does not seem to work atm
