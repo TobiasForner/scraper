@@ -7,10 +7,8 @@ import cv2
 from cv2.typing import MatLike
 from PIL import Image
 
-from scraper.files.util import partition_image_files
+from scraper.files.util import IMAGE_FILE_PATTERN, partition_image_files
 from scraper.img.montage import Montage
-
-IMPROVED_PATTERN = re.compile(r"(.*)_(\d+)_\d+\.(jpeg|jpg|png|svg)")
 
 
 def batch_all_images(
@@ -98,7 +96,7 @@ def group_images(images: list[Path]) -> tuple[list[Path], list[Path]]:
 
     for image in images:
         base_name = image.name
-        if IMPROVED_PATTERN.match(base_name):
+        if IMAGE_FILE_PATTERN.match(base_name):
             improved_names.append(image)
         elif simple_re.match(base_name):
             simple_names.append(image)
