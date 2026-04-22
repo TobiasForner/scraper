@@ -7,7 +7,7 @@ import cv2
 from cv2.typing import MatLike
 from PIL import Image
 
-from scraper.files.util import partition_improved_images
+from scraper.files.util import partition_image_files
 from scraper.img.montage import Montage
 
 IMPROVED_PATTERN = re.compile(r"(.*)_(\d+)_\d+\.(jpeg|jpg|png|svg)")
@@ -27,7 +27,7 @@ def batch_all_images(
 
 def batch_improved_images(images: list[Path], out_directory: Path):
     images.sort()
-    batch_to_images = partition_improved_images(images=images)
+    batch_to_images = partition_image_files(images=images)
     for (name, chapter), images in batch_to_images.items():
         print(f"{name}: Batch {chapter}")
         output_file = os.path.join(out_directory, f"{name}_{chapter:04}.png")

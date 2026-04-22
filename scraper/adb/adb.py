@@ -13,7 +13,7 @@ from rich.progress import track
 
 from scraper.download.download_progress import DownloadType
 from scraper.download.progress_manager import RangesProgressManager
-from scraper.files.util import images_in_dir, partition_improved_images
+from scraper.files.util import images_in_dir, partition_image_files
 from scraper.img.image_tools import find_blocked_chapters, image_split
 from scraper.util.dynamic_ranges import Ranges
 
@@ -166,7 +166,7 @@ def remove_multi_chapter_files_adb(
     progress = pm.load_progress().progress_by_name[name]
     local_images_dir = progress.base_dir() / "downloaded_images"
     local_files = images_in_dir(local_images_dir)
-    part = partition_improved_images(local_files)
+    part = partition_image_files(local_files)
     to_remove: list[str] = []
     for chapter in chapters:
         local_chapter_files = part[(name, chapter)]

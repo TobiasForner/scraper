@@ -9,7 +9,7 @@ from scraper.download.progress_manager import RangesProgressManager
 from scraper.files.util import (
     data_from_image_file_name,
     images_in_dir,
-    partition_improved_images,
+    partition_image_files,
 )
 
 SPLIT_THRESHOLD = 15000
@@ -151,7 +151,7 @@ def find_blocked_chapters(
     if name in progress.progress_by_name:
         prog = progress.progress_by_name[name]
         images = images_in_dir(prog.base_dir() / "downloaded_images")
-        image_partition = partition_improved_images(images)
+        image_partition = partition_image_files(images)
         for (name, chapter), chapter_paths in image_partition.items():
             chapter_paths.sort()
             if any(is_blocked(chapter_path) for chapter_path in chapter_paths):

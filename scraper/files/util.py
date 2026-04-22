@@ -7,7 +7,7 @@ from scraper.download.progress_manager import (
     RangesProgressManager,
 )
 
-IMPROVED_PATTERN = re.compile(r"(.*)_(\d+)_\d+\.(jpeg|jpg|png|svg)")
+IMAGE_FILE_PATTERN = re.compile(r"(.*)_(\d+)_\d+\.(jpeg|jpg|png|svg)")
 
 TEXT_FILE_PATTERN = re.compile(r"([a-zA-Z\-_]+)_(\d+)\.(txt)")
 
@@ -24,7 +24,7 @@ def remove_chapter(name: str, chapter: int, pm: RangesProgressManager):
     else:
         chapter_dir = series_progress.base_dir() / "downloaded_images"
         local_files = images_in_dir(chapter_dir)
-        part = partition_improved_images(local_files)
+        part = partition_image_files(local_files)
         for image in part[(name, chapter)]:
             image.unlink()
     progress.remove(name, chapter)
@@ -62,7 +62,7 @@ def files_in_dir(directory: Path, extensions: list[str] | None = None) -> list[P
     return res
 
 
-def partition_improved_images(
+def partition_image_files(
     images: list[Path],
 ) -> dict[tuple[str, int], list[Path]]:
     """Partition images by series name and chapter
@@ -87,7 +87,7 @@ def partition_improved_images(
 
 
 def data_from_image_file_name(file_name: str) -> tuple[str, int, str] | None:
-    m = IMPROVED_PATTERN.match(file_name)
+    m = IMAGE_FILE_PATTERN.match(file_name)
     if not m:
         return None
     name, chapter, ext = m.groups()

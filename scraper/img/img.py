@@ -8,7 +8,7 @@ from cv2.typing import MatLike
 from rich.progress import track
 
 from scraper.download.image_names import ImageNames
-from scraper.files.util import partition_improved_images
+from scraper.files.util import partition_image_files
 from scraper.img.batch_images import (
     batch_all_images,
 )
@@ -84,7 +84,7 @@ def list_split_images(directory: str):
 def split_images(directory: str):
     dir = Path(directory).resolve()
     res = images_above_threshold(dir)
-    batch_to_images = partition_improved_images(res)
+    batch_to_images = partition_image_files(res)
     for (name, chapter), images in batch_to_images.items():
         # load all images
         read_images: list[tuple[Path, MatLike | None]] = [

@@ -3,7 +3,7 @@ from scraper.download.progress_manager import RangesProgressManager
 from scraper.files.util import (
     files_in_dir,
     images_in_dir,
-    partition_improved_images,
+    partition_image_files,
     partition_text_files,
     remove_chapter,
 )
@@ -77,7 +77,7 @@ def __empty_chapters_for(
             return res
         if prog.has_base_dir():
             images = images_in_dir(prog.base_dir() / "downloaded_images")
-            image_partition = partition_improved_images(images)
+            image_partition = partition_image_files(images)
             for (name, chapter), chapter_paths in image_partition.items():
                 if verbose:
                     print(
