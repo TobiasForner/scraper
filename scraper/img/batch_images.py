@@ -56,7 +56,7 @@ def batch_images(
     prefix = f"{name + '_' if name else ''}b"
 
     while pos < len(images):
-        batch = []
+        batch: list[Path] = []
         while (
             pos < len(images)
             and int(os.path.splitext(base_images[pos])[0]) < batch_count * threshold

@@ -74,7 +74,7 @@ def partition_image_files(
         dict[tuple[str, int], list[Path]]: dict that maps (name, chapter) to the
         corresponding list of file paths
     """
-    batch_to_images = defaultdict(list)
+    batch_to_images: dict[tuple[(str, int)], list[Path]] = defaultdict(list)
     for image in images:
         base_name = image.name
         res = data_from_image_file_name(base_name)
@@ -96,7 +96,7 @@ def data_from_image_file_name(file_name: str) -> tuple[str, int, str] | None:
 
 
 def partition_text_files(text_files: list[Path]) -> dict[tuple[str, int], Path]:
-    res = {}
+    res: dict[tuple[str, int], Path] = {}
     for tf in text_files:
         data = data_from_text_file_name(tf.name)
         print(f"data: {data}")
