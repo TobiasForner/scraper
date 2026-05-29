@@ -99,7 +99,6 @@ def partition_text_files(text_files: list[Path]) -> dict[tuple[str, int], Path]:
     res: dict[tuple[str, int], Path] = {}
     for tf in text_files:
         data = data_from_text_file_name(tf.name)
-        print(f"data: {data}")
         if data is None:
             continue
         name, chapter, _ = data

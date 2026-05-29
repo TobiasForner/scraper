@@ -7,6 +7,7 @@ from scraper.files.util import (
     partition_text_files,
     remove_chapter,
 )
+from scraper.util.dynamic_ranges import Ranges
 
 
 def list_empty_chapters(
@@ -18,7 +19,13 @@ def list_empty_chapters(
         print("Empty chapters:")
         print(
             "\t"
-            + "\n\t".join([f"{name} {chapter}" for name, chapter in empty_chapters])
+            + "\n\t".join(
+                [
+                    f"{name} {chapters_ranges}"
+                    for name, chapters_ranges in empty_chapters.items()
+                    if list(chapters_ranges.chapters())
+                ]
+            )
         )
     else:
         print("No empty chapters!")
@@ -29,35 +36,31 @@ def remove_empty_chapters(
 ):
     pm = RangesProgressManager()
     empty_chapters = __empty_chapters(name, threshold, pm, verbose)
-    for name, chapter_string in empty_chapters:
-        print(f"Removing {name} {chapter_string}")
-        remove_chapter(name, int(chapter_string), pm)
+    for name, chapters in empty_chapters.items():
+        print(f"Removing {name} {chapters}")
+        for chapter in chapters.chapters():
+            remove_chapter(name, chapter, pm)
 
 
 def __empty_chapters(
     name: str | None, threshold: int, pm: RangesProgressManager, verbose: bool
-) -> list[tuple[str, int]]:
+) -> dict[str, Ranges]:
     if name is not None:
-        return [
-            (name, chapter)
-            for chapter in __empty_chapters_for(name, threshold, pm, verbose)
-        ]
+        return {name: __empty_chapters_for(name, threshold, pm, verbose)}
 
-    res: list[tuple[str, int]] = []
+    res: dict[str, Ranges] = {}
     progress = pm.load_progress()
     for name in progress.progress_by_name:
-        res += [
-            (name, chapter)
-            for chapter in __empty_chapters_for(name, threshold, pm, verbose)
-        ]
+        print(f"checking {name}")
+        res[name] = __empty_chapters_for(name, threshold, pm, verbose)
     return res
 
 
 def __empty_chapters_for(
     name: str, threshold: int, pm: RangesProgressManager, verbose: bool
-) -> list[int]:
+) -> Ranges:
+    res = Ranges(ranges=[])
     empty_text_signifiers = ['<p class="error">此信息不存在</p>']
-    res: list[int] = []
     progress = pm.load_progress()
     if name in progress.progress_by_name:
         prog = progress.progress_by_name[name]
@@ -72,7 +75,7 @@ def __empty_chapters_for(
                 if any([ets in text for ets in empty_text_signifiers]):
                     if verbose:
                         print(f"{name} {chapter} is empty")
-                    res.append(chapter)
+                    _ = res.add(chapter)
 
             return res
         if prog.has_base_dir():
@@ -84,8 +87,8 @@ def __empty_chapters_for(
                         f"{name} {chapter}: {len(chapter_paths)} paths: {chapter_paths}"
                     )
                 if len(chapter_paths) <= threshold:
-                    res.append(chapter)
+                    _ = res.add(chapter)
             for chapter in prog.chapters():
                 if (name, chapter) not in image_partition:
-                    res.append(chapter)
+                    _ = res.add(chapter)
     return res
